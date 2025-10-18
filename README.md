@@ -2,20 +2,20 @@
 
 Automated Node.js script to send personalized job application emails with resume attachments.
 
-## 🚀 Quick Start Options
+## Quick Start Options
 
 ### Option 1: Web UI (Recommended for beginners)
 ```bash
 npm run server
 # Open http://localhost:3000 in your browser
 ```
-👉 **[Web UI Guide](docs/WEB_UI_GUIDE.md)** - Complete guide for using the web interface
+ **[Web UI Guide](docs/WEB_UI_GUIDE.md)** - Complete guide for using the web interface
 
 ### Option 2: Command Line (For automation)
 ```bash
 node src/job_mailer.js
 ```
-👉 Continue reading below for command-line setup and usage
+ Continue reading below for command-line setup and usage
 
 ---
 
@@ -310,10 +310,10 @@ LinkedIn | Portfolio | Resume
 
 ## Tips
 
-- 🔐 **Never commit `.env` to Git** - it's already in `.gitignore`
-- ⏱️ **Use delays** - avoid sending too many emails quickly
-- ✅ **Test first** - send to yourself before batch sending
-- 📊 **Track results** - script shows summary after batch sending
+- **Never commit `.env` to Git** - it's already in `.gitignore`
+- **Use delays** - avoid sending too many emails quickly
+- **Test first** - send to yourself before batch sending
+- **Track results** - script shows summary after batch sending
 
 ## Customization
 
@@ -359,14 +359,4 @@ job-application-mailer/
 └── resumes/                  # Resume files
     └── hridyesh_resume.pdf  # Your resume
 ```
-
-## License
-
-MIT
-
-## Author
-
-Hridyesh Kumar
-- Email: hridyesh2309@gmail.com
-- Phone: +91-8130252611
 

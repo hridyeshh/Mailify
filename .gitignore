@@ -1,0 +1,27 @@
+# Environment variables (contains sensitive data)
+.env
+
+# Node modules
+node_modules/
+
+# Resumes (binary files)
+resumes/
+
+# Logs and schedules
+logs/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+

@@ -1,0 +1,12 @@
+# Copy this content to a new file named .env (without .txt extension)
+# Then fill in your actual values
+
+SENDER_EMAIL=hridyesh2309@gmail.com
+EMAIL_PASSWORD=your-16-character-app-password-here
+YOUR_NAME=Hridyesh Kumar
+YOUR_PHONE=+91-8130252611
+YOUR_LINKEDIN=https://linkedin.com/in/yourprofile
+YOUR_PORTFOLIO=https://yourportfolio.com
+YOUR_RESUME_LINK=https://yourresume.com
+RESUME_FILENAME=Hridyesh_Kumar_Resume.pdf
+

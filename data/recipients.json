@@ -1,0 +1,20 @@
+{
+  "recipients": [
+    {
+      "email": "hr@example.com",
+      "name": "Priya",
+      "company": "Google"
+    },
+    {
+      "email": "john.doe@microsoft.com",
+      "name": "",
+      "company": "Microsoft"
+    },
+    {
+      "email": "careers@amazon.com",
+      "name": "",
+      "company": "Amazon"
+    }
+  ]
+}
+

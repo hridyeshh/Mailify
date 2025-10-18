@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Mail Sender</title>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#141414",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#000000"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-black font-display text-white">
+    <div class="flex flex-col min-h-screen">
+        <header class="border-b border-white/20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center gap-4">
+                        <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 6.55106C21.9961 6.32353 21.9031 6.10549 21.7401 5.941C21.5772 5.77651 21.3592 5.68353 21.1317 5.67959L12.0003 4L2.86883 5.67959C2.6413 5.68353 2.42326 5.77651 2.26033 5.941C2.09739 6.10549 2.00441 6.32353 2.00047 6.55106V17.3828C2.00441 17.6103 2.09739 17.8284 2.26033 17.9928C2.42326 18.1573 2.6413 18.2503 2.86883 18.2542L12.0003 20L21.1317 18.2542C21.3592 18.2503 21.5772 18.1573 21.7401 17.9928C21.9031 17.8284 21.9961 17.6103 22 17.3828V6.55106ZM12.0003 18.4231L3.58557 16.8523V7.07928L12.0003 5.57692V18.4231ZM20.415 16.8523L12.0003 18.4231V5.57692L20.415 7.07928V16.8523Z" fill="currentColor"></path>
+                            <path d="M12 12.5C10.62 12.5 9.5 11.38 9.5 10C9.5 8.62 10.62 7.5 12 7.5C13.38 7.5 14.5 8.62 14.5 10C14.5 11.38 13.38 12.5 12 12.5Z" fill="currentColor"></path>
+                        </svg>
+                        <h1 class="text-xl font-bold text-white">Mail Sender</h1>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div id="userInfoBadge" class="hidden text-sm text-white/70">
+                            <span id="userNameDisplay" class="font-medium text-white"></span>
+                            <a href="/" class="ml-2 text-white hover:underline">Edit</a>
+                        </div>
+                        <button id="helpBtn" class="p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50">
+                            <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+                            </svg>
+                        </button>
+                        <div class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center font-bold" id="userInitials">
+                            MS
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Area -->
+        <div id="notification" class="hidden fixed top-20 right-4 max-w-md z-50"></div>
+
+        <main class="flex-grow">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="max-w-3xl mx-auto">
+                    <div class="mb-8">
+                        <h2 class="text-4xl font-black text-white leading-tight tracking-[-0.033em]">New Message</h2>
+                    </div>
+
+                    <form id="emailForm" class="space-y-6" onsubmit="return false;">
+                        <div>
+                            <label class="block text-white text-base font-medium leading-normal pb-2" for="recipients">Recipients</label>
+                            <textarea 
+                                class="form-input block w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-white/50 border border-white bg-black placeholder:text-[#adadad] p-[15px] text-base font-normal leading-normal" 
+                                id="recipients" 
+                                name="recipients" 
+                                placeholder="Recipients (comma or newline separated, e.g., user1@gmail.com, user2@gmail.com)" 
+                                rows="4"
+                                required></textarea>
+                            <p class="mt-1 text-sm text-white/60">Enter email addresses separated by commas or line breaks</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-white text-base font-medium leading-normal pb-2" for="subject">Subject</label>
+                            <input 
+                                class="form-input block w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-white/50 border border-white bg-black h-14 placeholder:text-[#adadad] p-[15px] text-base font-normal leading-normal" 
+                                id="subject" 
+                                name="subject" 
+                                placeholder="Enter email subject" 
+                                type="text"
+                                required/>
+                        </div>
+
+                        <div>
+                            <label class="block text-white text-base font-medium leading-normal pb-2" for="message">Message</label>
+                            <textarea 
+                                class="form-input block w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-white/50 border border-white bg-black placeholder:text-[#adadad] p-[15px] text-base font-normal leading-normal" 
+                                id="message" 
+                                name="message" 
+                                placeholder="Compose your message..." 
+                                rows="10"
+                                required></textarea>
+                            <p class="mt-1 text-sm text-white/60">HTML formatting is supported</p>
+                        </div>
+
+                        <!-- Schedule Section (hidden by default) -->
+                        <div id="scheduleSection" class="hidden">
+                            <label class="block text-white text-base font-medium leading-normal pb-2">Schedule Time</label>
+                            <input 
+                                type="datetime-local" 
+                                id="scheduleTime"
+                                class="form-input block w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-white/50 border border-white bg-black h-14 p-[15px] text-base font-normal leading-normal"
+                            />
+                            <p class="mt-1 text-sm text-white/60">Select when to send the email</p>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4">
+                            <button 
+                                id="customMessageBtn"
+                                class="px-6 py-3 rounded-lg text-sm font-semibold border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-white/50" 
+                                type="button">
+                                Use Custom Message
+                            </button>
+
+                            <div class="flex gap-4">
+                                <button 
+                                    id="scheduleBtn"
+                                    class="px-6 py-3 rounded-lg text-sm font-semibold border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-white/50" 
+                                    type="button">
+                                    Schedule Mail
+                                </button>
+                                
+                                <button 
+                                    id="sendBtn"
+                                    class="px-6 py-3 rounded-lg text-sm font-semibold bg-white text-black hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed" 
+                                    type="submit">
+                                    <span id="sendBtnText">Send Mail</span>
+                                    <span id="sendBtnSpinner" class="hidden">
+                                        <svg class="inline animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Sending...
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        let isScheduleMode = false;
+
+        // DOM Elements
+        const form = document.getElementById('emailForm');
+        const sendBtn = document.getElementById('sendBtn');
+        const sendBtnText = document.getElementById('sendBtnText');
+        const sendBtnSpinner = document.getElementById('sendBtnSpinner');
+        const scheduleBtn = document.getElementById('scheduleBtn');
+        const scheduleSection = document.getElementById('scheduleSection');
+        const scheduleTimeInput = document.getElementById('scheduleTime');
+        const customMessageBtn = document.getElementById('customMessageBtn');
+        const helpBtn = document.getElementById('helpBtn');
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.innerHTML = `
+                <div class="${bgColor} text-white px-6 py-4 rounded-lg shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <span>${message}</span>
+                        <button onclick="this.parentElement.parentElement.parentElement.classList.add('hidden')" class="ml-4 text-white hover:text-gray-200">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            notification.classList.remove('hidden');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email.trim());
+        }
+
+        // Parse recipients
+        function parseRecipients(text) {
+            return text.split(/[,\n]/)
+                .map(email => email.trim())
+                .filter(email => email.length > 0);
+        }
+
+        // Validate form
+        function validateForm() {
+            const recipients = document.getElementById('recipients').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            const errors = [];
+
+            // Check recipients
+            if (!recipients.trim()) {
+                errors.push('Recipients field is required');
+            } else {
+                const emails = parseRecipients(recipients);
+                if (emails.length === 0) {
+                    errors.push('At least one recipient email is required');
+                } else {
+                    const invalidEmails = emails.filter(email => !isValidEmail(email));
+                    if (invalidEmails.length > 0) {
+                        errors.push(`Invalid email address(es): ${invalidEmails.join(', ')}`);
+                    }
+                }
+            }
+
+            // Check subject
+            if (!subject.trim()) {
+                errors.push('Subject field is required');
+            }
+
+            // Check message
+            if (!message.trim()) {
+                errors.push('Message field is required');
+            }
+
+            // Check schedule time if in schedule mode
+            if (isScheduleMode) {
+                const scheduleTime = scheduleTimeInput.value;
+                if (!scheduleTime) {
+                    errors.push('Please select a schedule time');
+                } else {
+                    const scheduleDate = new Date(scheduleTime);
+                    if (scheduleDate <= new Date()) {
+                        errors.push('Schedule time must be in the future');
+                    }
+                }
+            }
+
+            return errors;
+        }
+
+        // Toggle loading state
+        function setLoading(loading) {
+            sendBtn.disabled = loading;
+            if (loading) {
+                sendBtnText.classList.add('hidden');
+                sendBtnSpinner.classList.remove('hidden');
+            } else {
+                sendBtnText.classList.remove('hidden');
+                sendBtnSpinner.classList.add('hidden');
+            }
+        }
+
+        // Send email
+        async function sendEmail(data) {
+            const response = await fetch(`${API_BASE}/send-email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.errors ? result.errors.join(', ') : result.error || 'Failed to send email');
+            }
+
+            return result;
+        }
+
+        // Schedule email
+        async function scheduleEmail(data) {
+            const response = await fetch(`${API_BASE}/schedule-email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.errors ? result.errors.join(', ') : result.error || 'Failed to schedule email');
+            }
+
+            return result;
+        }
+
+        // Form submit handler
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validate form
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showNotification(errors.join('<br>'), 'error');
+                return;
+            }
+
+            // Get form data
+            const formData = {
+                recipients: document.getElementById('recipients').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value
+            };
+
+            // Add resume file if available
+            const savedDetails = localStorage.getItem('userDetails');
+            if (savedDetails) {
+                const userInfo = JSON.parse(savedDetails);
+                if (userInfo.resume && userInfo.resume.data) {
+                    formData.resumeFile = userInfo.resume;
+                }
+            }
+
+            setLoading(true);
+
+            try {
+                if (isScheduleMode) {
+                    // Schedule email
+                    formData.sendAt = new Date(scheduleTimeInput.value).toISOString();
+                    const result = await scheduleEmail(formData);
+                    showNotification(`Email scheduled successfully! Will be sent at ${new Date(result.scheduledFor).toLocaleString()}`, 'success');
+                    form.reset();
+                    isScheduleMode = false;
+                    scheduleSection.classList.add('hidden');
+                    scheduleBtn.textContent = 'Schedule Mail';
+                } else {
+                    // Send immediately
+                    const result = await sendEmail(formData);
+                    if (result.success) {
+                        showNotification(`Email sent successfully to ${result.totalSent} recipient(s)!`, 'success');
+                        if (result.totalFailed > 0) {
+                            showNotification(`Warning: ${result.totalFailed} email(s) failed to send`, 'error');
+                        }
+                        form.reset();
+                    } else {
+                        throw new Error('Failed to send email');
+                    }
+                }
+            } catch (error) {
+                showNotification(error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Schedule button handler
+        scheduleBtn.addEventListener('click', () => {
+            isScheduleMode = !isScheduleMode;
+            if (isScheduleMode) {
+                scheduleSection.classList.remove('hidden');
+                scheduleBtn.textContent = 'Send Now';
+                sendBtnText.textContent = 'Schedule Mail';
+                
+                // Set minimum datetime to now
+                const now = new Date();
+                now.setMinutes(now.getMinutes() + 5); // Minimum 5 minutes from now
+                scheduleTimeInput.min = now.toISOString().slice(0, 16);
+            } else {
+                scheduleSection.classList.add('hidden');
+                scheduleBtn.textContent = 'Schedule Mail';
+                sendBtnText.textContent = 'Send Mail';
+            }
+        });
+
+        // Custom message button handler
+        customMessageBtn.addEventListener('click', () => {
+            // Get user details from localStorage
+            const savedDetails = localStorage.getItem('userDetails');
+            let userInfo = {
+                name: 'Your Name',
+                email: 'your@email.com',
+                phone: '+1-234-567-8900',
+                linkedin: 'https://linkedin.com/in/yourprofile',
+                resume: 'https://yourresume.com',
+                portfolio: 'https://yourportfolio.com'
+            };
+
+            if (savedDetails) {
+                userInfo = JSON.parse(savedDetails);
+            }
+
+            const predefinedMessage = `
+<div style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #333;">
+    <p>Hello,</p>
+    
+    <p>This is a professionally formatted email template. You can customize this text as needed.</p>
+    
+    <p>Key features:</p>
+    <ul>
+        <li>Professional formatting</li>
+        <li>HTML support</li>
+        <li>Easy customization</li>
+    </ul>
+    
+    <p>Best regards,<br><br>
+    ${userInfo.name}<br>
+    Email: ${userInfo.email}<br>
+    Phone: ${userInfo.phone}<br><br>
+    <a href="${userInfo.linkedin}" style="color: #1a73e8; text-decoration: underline;">LinkedIn</a>${userInfo.portfolio ? ' | <a href="' + userInfo.portfolio + '" style="color: #1a73e8; text-decoration: underline;">Portfolio</a>' : ''}${userInfo.resume && userInfo.resume.filename ? ' | Resume attached: ' + userInfo.resume.filename : ''}
+    </p>
+</div>
+            `.trim();
+            
+            document.getElementById('message').value = predefinedMessage;
+            showNotification('Custom message template loaded with your details!', 'info');
+        });
+
+        // Help button handler
+        helpBtn.addEventListener('click', () => {
+            const helpText = `
+<strong>Mail Sender Help</strong><br><br>
+<strong>Recipients:</strong> Enter email addresses separated by commas or line breaks<br>
+<strong>Subject:</strong> Email subject line<br>
+<strong>Message:</strong> Email body (HTML supported)<br><br>
+<strong>Custom Message:</strong> Load a pre-formatted template<br>
+<strong>Schedule Mail:</strong> Send email at a specific time<br>
+<strong>Send Mail:</strong> Send email immediately
+            `;
+            showNotification(helpText, 'info');
+        });
+
+        // Initialize - Set minimum schedule time
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 5);
+        scheduleTimeInput.min = now.toISOString().slice(0, 16);
+
+        // Load and display user details if available
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedDetails = localStorage.getItem('userDetails');
+            if (savedDetails) {
+                const userInfo = JSON.parse(savedDetails);
+                
+                // Show user info in header
+                const userInfoBadge = document.getElementById('userInfoBadge');
+                const userNameDisplay = document.getElementById('userNameDisplay');
+                const userInitials = document.getElementById('userInitials');
+                
+                userNameDisplay.textContent = userInfo.name;
+                userInfoBadge.classList.remove('hidden');
+                
+                // Set initials
+                const nameParts = userInfo.name.split(' ');
+                const initials = nameParts.length >= 2 
+                    ? nameParts[0][0] + nameParts[1][0] 
+                    : nameParts[0][0] + (nameParts[0][1] || '');
+                userInitials.textContent = initials.toUpperCase();
+            }
+        });
+
+        console.log('✅ Mail Sender UI loaded successfully');
+    </script>
+</body>
+</html>
+

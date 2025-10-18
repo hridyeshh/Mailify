@@ -63,12 +63,12 @@ Edit `.env` and add your details:
 ```env
 SENDER_EMAIL=your-email@gmail.com
 EMAIL_PASSWORD=your-16-char-app-password
-YOUR_NAME=Hridyesh Kumar
-YOUR_PHONE=+91-8130252611
+YOUR_NAME=Your Name
+YOUR_PHONE=+1-XXX-XXX-XXXX
 YOUR_LINKEDIN=https://linkedin.com/in/yourprofile
 YOUR_PORTFOLIO=https://yourportfolio.com
 YOUR_RESUME_LINK=https://yourresume.com
-RESUME_FILENAME=hridyesh_resume.pdf
+RESUME_FILENAME=your_resume.pdf
 
 # Google Gemini AI API Key (for AI-powered message generation)
 GEMINI_API_KEY=your-gemini-api-key-here
@@ -76,7 +76,7 @@ GEMINI_API_KEY=your-gemini-api-key-here
 
 ### 3. Add Your Resume
 
-Place your resume PDF in the `resumes/` folder with the name specified in `.env` (default: `hridyesh_resume.pdf`)
+Place your resume PDF in the `resumes/` folder with the name specified in `.env` (default: `your_resume.pdf`)
 
 ### 4. Test Connection
 
@@ -269,19 +269,19 @@ If you don't provide a recipient name, the script automatically extracts it from
 ### Email Template
 
 ```
-Subject: Hridyesh Kumar SDE application
+Subject: Your Name - Job Application
 
 Hey [Name],
 
 Hope you are doing great and winning at everything you take on!
 
-This is Hridyesh Kumar. I recently completed my SDE internship at Limeroad...
+This is Your Name. I recently completed my internship at Company...
 [Your full message]
 
 Regards,
-Hridyesh Kumar
-Mail - hridyesh2309@gmail.com
-Phone - +91-8130252611
+Your Name
+Mail - your-email@gmail.com
+Phone - +1-XXX-XXX-XXXX
 LinkedIn | Portfolio | Resume
 ```
 
@@ -357,6 +357,6 @@ job-application-mailer/
 │   ├── SCHEDULING_GUIDE.md  # Scheduling guide
 │   └── ...                  # Other docs
 └── resumes/                  # Resume files
-    └── hridyesh_resume.pdf  # Your resume
+    └── your_resume.pdf      # Your resume
 ```
 

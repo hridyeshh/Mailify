@@ -1,15 +1,15 @@
 # Copy this content to a new file named .env (without .txt extension)
 # Then fill in your actual values
 
-SENDER_EMAIL=hridyesh2309@gmail.com
+SENDER_EMAIL=your-email@gmail.com
 EMAIL_PASSWORD=your-16-character-app-password-here
-YOUR_NAME=Hridyesh Kumar
-YOUR_PHONE=+91-8130252611
+YOUR_NAME=Your Name
+YOUR_PHONE=+1-XXX-XXX-XXXX
 YOUR_LINKEDIN=https://linkedin.com/in/yourprofile
 YOUR_PORTFOLIO=https://yourportfolio.com
 YOUR_RESUME_LINK=https://yourresume.com
-RESUME_FILENAME=hridyesh_resume.pdf
+RESUME_FILENAME=your_resume.pdf
 
 # Google Gemini AI API Key (for AI-powered message generation)
-GEMINI_API_KEY=AIzaSyDRLc7SwUBIjUOOld0H3RqHV2SrBULptts
+GEMINI_API_KEY=your-gemini-api-key-here
 

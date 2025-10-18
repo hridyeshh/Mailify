@@ -10,6 +10,9 @@ resumes/
 # Logs and schedules
 logs/
 
+# Temporary uploaded files
+temp/
+
 # Logs
 *.log
 npm-debug.log*

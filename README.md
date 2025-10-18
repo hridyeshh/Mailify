@@ -21,7 +21,8 @@ node src/job_mailer.js
 
 ## Features
 
-- 🌐 **Web Interface** - Modern UI for easy email sending (NEW!)
+- 🤖 **AI-Powered Message Generation** - Google Gemini AI creates personalized messages based on your resume (NEW!)
+- 🌐 **Web Interface** - Modern UI for easy email sending
 - 📧 **Automatic name extraction** from email addresses
 - 🎯 **Personalized messages** with recipient name and company
 - 📎 **Resume attachment** support
@@ -37,6 +38,7 @@ node src/job_mailer.js
 - **Node.js** (v14 or higher) - [Download here](https://nodejs.org)
 - **Gmail account** with 2-Factor Authentication enabled
 - **Gmail App Password** - [Get it here](https://myaccount.google.com/apppasswords)
+- **Google Gemini API Key** (for AI features) - [Get it here](https://makersuite.google.com/app/apikey)
 
 ## Setup Instructions
 
@@ -66,12 +68,15 @@ YOUR_PHONE=+91-8130252611
 YOUR_LINKEDIN=https://linkedin.com/in/yourprofile
 YOUR_PORTFOLIO=https://yourportfolio.com
 YOUR_RESUME_LINK=https://yourresume.com
-RESUME_FILENAME=Hridyesh_Kumar_Resume.pdf
+RESUME_FILENAME=hridyesh_resume.pdf
+
+# Google Gemini AI API Key (for AI-powered message generation)
+GEMINI_API_KEY=your-gemini-api-key-here
 ```
 
 ### 3. Add Your Resume
 
-Place your resume PDF in the project folder with the name specified in `.env` (default: `Hridyesh_Kumar_Resume.pdf`)
+Place your resume PDF in the `resumes/` folder with the name specified in `.env` (default: `hridyesh_resume.pdf`)
 
 ### 4. Test Connection
 
@@ -82,6 +87,38 @@ npm start
 This tests your email configuration.
 
 ## Usage
+
+### 🤖 AI-Powered Message Generation (Recommended!)
+
+The easiest way to create personalized job application emails:
+
+1. **Start the web server:**
+   ```bash
+   npm run server
+   ```
+
+2. **Open the composer** at http://localhost:3000/composer.html
+
+3. **Upload your resume and generate:**
+   - Click to upload your resume (PDF format)
+   - Click "Generate AI Message"
+   - AI will analyze your resume and create a professional message template
+   - Review and edit the generated message
+   - Confirm and send to multiple recipients!
+
+**How it works:**
+- Upload your resume PDF file
+- Backend converts PDF to markdown format
+- Sends markdown to Google Gemini AI (with your API key)
+- AI analyzes your skills and experience
+- Generates a generic template message that:
+  - Starts with "Hello," (no specific name)
+  - Uses "your company" as placeholder
+  - Highlights your key skills from the resume
+  - Matches professional job application tone
+- You can edit and customize before sending
+
+---
 
 ### Option 1: Single Email
 

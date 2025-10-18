@@ -63,6 +63,7 @@
         <!-- Notification Area -->
         <div id="notification" class="hidden fixed top-20 right-4 max-w-md z-50"></div>
 
+
         <main class="flex-grow">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div class="max-w-3xl mx-auto">
@@ -93,6 +94,7 @@
                                 type="text"
                                 required/>
                         </div>
+
 
                         <div>
                             <label class="block text-white text-base font-medium leading-normal pb-2" for="message">Message</label>
@@ -425,6 +427,7 @@
             document.getElementById('message').value = predefinedMessage;
             showNotification('Custom message template loaded with your details!', 'info');
         });
+
 
         // Help button handler
         helpBtn.addEventListener('click', () => {

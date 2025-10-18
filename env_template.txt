@@ -8,5 +8,8 @@ YOUR_PHONE=+91-8130252611
 YOUR_LINKEDIN=https://linkedin.com/in/yourprofile
 YOUR_PORTFOLIO=https://yourportfolio.com
 YOUR_RESUME_LINK=https://yourresume.com
-RESUME_FILENAME=Hridyesh_Kumar_Resume.pdf
+RESUME_FILENAME=hridyesh_resume.pdf
+
+# Google Gemini AI API Key (for AI-powered message generation)
+GEMINI_API_KEY=AIzaSyDRLc7SwUBIjUOOld0H3RqHV2SrBULptts
 

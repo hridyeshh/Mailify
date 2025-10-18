@@ -3,13 +3,35 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import schedule from 'node-schedule';
+import multer from 'multer';
+import fs from 'fs';
 import { JobApplicationMailer } from './job_mailer.js';
+import { aiGenerator } from './ai_message_generator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Configure multer for file uploads
+const upload = multer({
+    dest: path.join(__dirname, '../temp/'),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'application/pdf') {
+            cb(null, true);
+        } else {
+            cb(new Error('Only PDF files are allowed'));
+        }
+    }
+});
+
+// Ensure temp directory exists
+const tempDir = path.join(__dirname, '../temp');
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
 
 // Middleware
 app.use(cors());
@@ -105,6 +127,177 @@ app.post('/api/test-connection', async (req, res) => {
             success: false,
             error: error.message 
         });
+    }
+});
+
+// Generate AI message
+app.post('/api/generate-message', async (req, res) => {
+    try {
+        const { 
+            recipientName = 'Hiring Manager',
+            recipientEmail = '',
+            companyName = '',
+            jobTitle = 'Software Development position',
+            additionalContext = '',
+            userDetails = null
+        } = req.body;
+
+        console.log('\n🤖 Received AI message generation request');
+        console.log(`   Recipient: ${recipientName}`);
+        console.log(`   Company: ${companyName}`);
+        console.log(`   Position: ${jobTitle}`);
+
+        // Generate message using AI
+        const generatedMessage = await aiGenerator.generateMessage({
+            recipientName,
+            recipientEmail,
+            companyName,
+            jobTitle,
+            additionalContext,
+            userDetails
+        });
+
+        res.json({
+            success: true,
+            message: generatedMessage,
+            metadata: {
+                recipientName,
+                companyName,
+                jobTitle,
+                generatedAt: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error generating AI message:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            fallback: aiGenerator.getFallbackMessage({
+                recipientName: req.body.recipientName,
+                companyName: req.body.companyName,
+                jobTitle: req.body.jobTitle
+            })
+        });
+    }
+});
+
+// Generate multiple AI message variations
+app.post('/api/generate-variations', async (req, res) => {
+    try {
+        const { 
+            recipientName = 'Hiring Manager',
+            recipientEmail = '',
+            companyName = '',
+            jobTitle = 'Software Development position',
+            additionalContext = '',
+            count = 3
+        } = req.body;
+
+        console.log(`\n🤖 Generating ${count} message variations`);
+
+        // Generate message variations
+        const variations = await aiGenerator.generateMessageVariations({
+            recipientName,
+            recipientEmail,
+            companyName,
+            jobTitle,
+            additionalContext
+        }, Math.min(count, 5)); // Limit to 5 variations max
+
+        res.json({
+            success: true,
+            variations: variations,
+            count: variations.length,
+            metadata: {
+                recipientName,
+                companyName,
+                jobTitle,
+                generatedAt: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error generating message variations:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Generate AI message from uploaded resume
+app.post('/api/generate-message-from-resume', upload.single('resume'), async (req, res) => {
+    let tempFilePath = null;
+    
+    try {
+        console.log('\n📥 Received resume upload request');
+        
+        if (!req.file) {
+            console.error('❌ No file in request');
+            return res.status(400).json({
+                success: false,
+                error: 'No resume file uploaded'
+            });
+        }
+
+        tempFilePath = req.file.path;
+        console.log('📄 Resume uploaded:', req.file.originalname);
+        console.log('📁 Temp file path:', tempFilePath);
+        console.log('🤖 Starting AI message generation from resume...');
+
+        // Create a custom AI generator with the uploaded file
+        const { AIMessageGenerator } = await import('./ai_message_generator.js');
+        const customGenerator = new AIMessageGenerator();
+        
+        console.log('✅ AI Generator created');
+        
+        // Override the resume path temporarily
+        customGenerator.resumePath = tempFilePath;
+        
+        console.log('📤 Calling AI to generate message...');
+        
+        // Generate message using the uploaded resume
+        const generatedMessage = await customGenerator.generateMessage({
+            recipientName: '',
+            recipientEmail: '',
+            companyName: 'your company',
+            jobTitle: '',
+            additionalContext: 'Create a generic template message that starts with "Hello," and uses "your company" as placeholder'
+        });
+
+        console.log('✅ AI message generated successfully from uploaded resume');
+
+        res.json({
+            success: true,
+            message: generatedMessage,
+            metadata: {
+                fileName: req.file.originalname,
+                fileSize: req.file.size,
+                generatedAt: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error generating message from resume:');
+        console.error('   Error message:', error.message);
+        console.error('   Error stack:', error.stack);
+        
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            fallback: aiGenerator.getFallbackMessage({})
+        });
+    } finally {
+        // Clean up temporary file
+        if (tempFilePath && fs.existsSync(tempFilePath)) {
+            try {
+                fs.unlinkSync(tempFilePath);
+                console.log('🗑️  Temporary file cleaned up');
+            } catch (cleanupError) {
+                console.error('⚠️  Failed to cleanup temp file:', cleanupError.message);
+            }
+        }
     }
 });
 
@@ -331,6 +524,14 @@ app.get('/composer', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/composer.html'));
 });
 
+app.get('/position-portfolio', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/position-portfolio.html'));
+});
+
+app.get('/final-message', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/final-message.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Server error:', err);
@@ -340,9 +541,39 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Error handling middleware
+app.use((error, req, res, next) => {
+    console.error('❌ Server error:', error);
+    
+    // Multer errors
+    if (error instanceof multer.MulterError) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                success: false,
+                error: 'File is too large. Maximum size is 10MB.'
+            });
+        }
+        return res.status(400).json({
+            success: false,
+            error: `Upload error: ${error.message}`
+        });
+    }
+    
+    // Other errors
+    res.status(500).json({
+        success: false,
+        error: error.message || 'Internal server error'
+    });
+});
+
 // Start server
 app.listen(PORT, () => {
-    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📧 Mail sender UI available at http://localhost:${PORT}\n`);
+    console.log('='.repeat(70));
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log('='.repeat(70));
+    console.log('\n📧 Available endpoints:');
+    console.log('   • POST /api/generate-message-from-resume - Generate AI message');
+    console.log('   • GET  /composer.html                    - Email composer');
+    console.log(`\n✨ Open http://localhost:${PORT}/composer.html in your browser\n`);
 });
 

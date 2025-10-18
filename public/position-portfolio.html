@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Position & Portfolio - Mailify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <div class="flex-grow">
+        <!-- Header -->
+        <header class="bg-black border-b border-white/10">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">M</span>
+                        </div>
+                        <h1 class="text-xl font-bold">Mailify</h1>
+                    </div>
+                    
+                    <div id="userInfoBadge" class="hidden flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
+                        <div id="userInitials" class="w-6 h-6 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-xs font-bold text-white"></div>
+                        <span id="userNameDisplay" class="text-sm text-white/80"></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Area -->
+        <div id="notification" class="hidden fixed top-20 right-4 max-w-md z-50"></div>
+
+        <main class="flex-grow">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="max-w-2xl mx-auto">
+                    <div class="mb-8">
+                        <h2 class="text-4xl font-black text-white leading-tight tracking-[-0.033em]">Position & Portfolio</h2>
+                        <p class="text-white/60 text-lg mt-2">Tell us about the position you're seeking and your portfolio</p>
+                    </div>
+
+                    <form id="positionPortfolioForm" class="space-y-6">
+                        <!-- Position Input -->
+                        <div>
+                            <label class="block text-white text-base font-medium leading-normal pb-2" for="position">Position You're Seeking</label>
+                            <input 
+                                class="form-input block w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-white/50 border border-white bg-black h-14 placeholder:text-[#adadad] p-[15px] text-base font-normal leading-normal" 
+                                id="position" 
+                                name="position" 
+                                placeholder="e.g., SDE-1, Software Engineer, Frontend Developer" 
+                                type="text"
+                                required/>
+                        </div>
+
+                        <!-- Portfolio Input -->
+                        <div>
+                            <label class="block text-white text-base font-medium leading-normal pb-2" for="portfolio">Portfolio <span class="text-gray-400">(Optional)</span></label>
+                            <input 
+                                class="form-input block w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-white/50 border border-white bg-black h-14 placeholder:text-[#adadad] p-[15px] text-base font-normal leading-normal" 
+                                id="portfolio" 
+                                name="portfolio" 
+                                placeholder="https://yourportfolio.com" 
+                                type="url"/>
+                        </div>
+
+                        <!-- Continue Button -->
+                        <div class="pt-4">
+                            <button 
+                                id="continueBtn"
+                                class="w-full px-6 py-4 rounded-lg text-base font-bold bg-white text-black hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed" 
+                                type="submit">
+                                <span id="continueBtnText">Continue</span>
+                                <span id="continueBtnSpinner" class="hidden">
+                                    <svg class="inline animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Generating Message...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // DOM elements
+        const form = document.getElementById('positionPortfolioForm');
+        const continueBtn = document.getElementById('continueBtn');
+        const continueBtnText = document.getElementById('continueBtnText');
+        const continueBtnSpinner = document.getElementById('continueBtnSpinner');
+
+        // Set loading state
+        function setLoading(loading) {
+            if (loading) {
+                continueBtn.disabled = true;
+                continueBtnText.classList.add('hidden');
+                continueBtnSpinner.classList.remove('hidden');
+            } else {
+                continueBtn.disabled = false;
+                continueBtnText.classList.remove('hidden');
+                continueBtnSpinner.classList.add('hidden');
+            }
+        }
+
+        // Form validation
+        function validateForm() {
+            const position = document.getElementById('position').value.trim();
+            const portfolio = document.getElementById('portfolio').value.trim();
+            
+            console.log('🔍 Validation - Form values:', { position, portfolio });
+            
+            const errors = [];
+
+            if (!position) {
+                errors.push('Position is required');
+            }
+
+            if (portfolio && !isValidUrl(portfolio)) {
+                errors.push('Please enter a valid portfolio URL');
+            }
+
+            return errors;
+        }
+
+        // URL validation
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.innerHTML = `
+                <div class="${bgColor} text-white px-4 py-3 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm">${message}</span>
+                        <button onclick="this.parentElement.parentElement.parentElement.classList.add('hidden')" class="ml-4 text-white hover:text-gray-200">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            notification.classList.remove('hidden');
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Form submit handler
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validate form
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showNotification(errors.join('<br>'), 'error');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const position = document.getElementById('position').value.trim();
+                const portfolio = document.getElementById('portfolio').value.trim();
+                
+                console.log('🔍 Form values:', { position, portfolio });
+
+                // Update user details in localStorage
+                const savedDetails = localStorage.getItem('userDetails');
+                if (savedDetails) {
+                    const userDetails = JSON.parse(savedDetails);
+                    userDetails.position = position;
+                    userDetails.portfolio = portfolio;
+                    localStorage.setItem('userDetails', JSON.stringify(userDetails));
+                }
+
+                // Store in session storage for next page
+                sessionStorage.setItem('position', position);
+                sessionStorage.setItem('portfolio', portfolio);
+
+                showNotification('Generating your personalized message...', 'info');
+                
+                // Get user details for AI generation
+                const userDetails = savedDetails ? JSON.parse(savedDetails) : null;
+                
+                // Generate AI message
+                const response = await fetch('/api/generate-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        recipientName: '',
+                        recipientEmail: '',
+                        companyName: 'your company',
+                        jobTitle: position,
+                        additionalContext: 'Create a professional email using the existing format but customize the skills and experiences based on the resume.',
+                        userDetails: userDetails
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store the generated message
+                    sessionStorage.setItem('aiGeneratedMessage', data.message);
+                    
+                    // Redirect to final page
+                    window.location.href = '/final-message.html';
+                } else {
+                    throw new Error(data.error || 'Failed to generate message');
+                }
+
+            } catch (error) {
+                console.error('Error generating AI message:', error);
+                showNotification('Failed to generate AI message. Please try again.', 'error');
+                setLoading(false);
+            }
+        });
+
+        // Load user details if available
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedDetails = localStorage.getItem('userDetails');
+            if (savedDetails) {
+                const userInfo = JSON.parse(savedDetails);
+                
+                // Show user info in header
+                const userInfoBadge = document.getElementById('userInfoBadge');
+                const userNameDisplay = document.getElementById('userNameDisplay');
+                const userInitials = document.getElementById('userInitials');
+                
+                userNameDisplay.textContent = userInfo.name;
+                userInfoBadge.classList.remove('hidden');
+                
+                // Set initials
+                const nameParts = userInfo.name.split(' ');
+                const initials = nameParts.length >= 2 
+                    ? nameParts[0][0] + nameParts[1][0] 
+                    : nameParts[0][0] + (nameParts[0][1] || '');
+                userInitials.textContent = initials.toUpperCase();
+
+                // Pre-fill form if data exists
+                if (userInfo.position) {
+                    document.getElementById('position').value = userInfo.position;
+                }
+                if (userInfo.portfolio) {
+                    document.getElementById('portfolio').value = userInfo.portfolio;
+                }
+            }
+        });
+
+        console.log('✅ Position & Portfolio page loaded');
+    </script>
+</body>
+</html>

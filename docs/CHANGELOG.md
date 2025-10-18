@@ -2,6 +2,72 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2025-10-18
+
+### Added
+- **AI-Powered Message Generation with Google Gemini**
+  - **What**: Integrated Google Gemini AI to automatically generate professional job application email templates based on uploaded resume analysis
+  - **Why**: Reduces time spent writing emails, ensures professional messaging, and creates contextually relevant content highlighting candidate's skills
+  - **How**: 
+    - Created `ai_message_generator.js` module with PDF-to-markdown conversion using `pdf2md-js`
+    - Integrated Google Generative AI SDK (`@google/generative-ai`) for message generation
+    - Added intelligent prompt engineering that analyzes resume skills and experience
+    - Implemented file upload with multer for resume processing
+    - Backend converts uploaded PDF → Markdown → AI analysis → Generated message
+    - Creates generic templates with "Hello," greeting and "your company" placeholder
+    - Implemented fallback mechanisms for when AI or resume processing fails
+
+- **AI Message Generation UI Flow with File Upload**
+  - **What**: Beautiful, intuitive UI for uploading resume and AI message generation with loading states and smooth transitions
+  - **Why**: Provides excellent user experience with visual feedback during file upload and AI processing
+  - **How**:
+    - Added drag-and-drop resume upload interface in `composer.html`
+    - File validation for PDF format and 10MB size limit
+    - Created animated loading modal with progress steps (analyzing resume, understanding context, crafting message)
+    - Built `ai-message.html` page for reviewing and editing AI-generated messages
+    - Implemented session storage for seamless data transfer between pages
+    - Added file removal functionality and upload status indicators
+
+- **API Endpoints for AI Features**
+  - **What**: RESTful API endpoints `/api/generate-message`, `/api/generate-variations`, and `/api/generate-message-from-resume`
+  - **Why**: Enables web UI to access AI capabilities with file upload support
+  - **How**: 
+    - Added `/api/generate-message-from-resume` endpoint with multer middleware for file uploads
+    - Accepts PDF resumes, converts to markdown, and generates AI message
+    - Temporary file handling with automatic cleanup after processing
+    - Implemented error handling with fallback messages
+    - Added support for generating multiple message variations with different tones
+
+- **Resume Processing Pipeline**
+  - **What**: Automatic PDF resume conversion to markdown for AI analysis
+  - **Why**: Allows AI to understand resume content and highlight relevant skills/experience
+  - **How**:
+    - Integrated `pdf2md-js` library for PDF parsing
+    - Created fallback to environment variables if PDF conversion fails
+    - Implemented resume analysis that extracts key information for personalization
+
+### Changed
+- **Composer Interface Enhancement**
+  - **What**: Added prominent AI generation section above manual message composition
+  - **Why**: Makes AI features the primary workflow while keeping manual composition as an option
+  - **How**: Redesigned form layout with gradient styling and clear separation between AI and manual modes
+
+- **Environment Configuration**
+  - **What**: Added `GEMINI_API_KEY` to environment variables
+  - **Why**: Secures API credentials and makes AI features configurable
+  - **How**: Updated `env_template.txt` with API key field and documentation
+
+### Updated
+- **Package Dependencies**
+  - Added `pdf2md-js` for PDF to markdown conversion
+  - Added `@google/generative-ai` for Gemini AI integration
+  - Added `multer` for handling multipart/form-data file uploads
+
+- **Documentation**
+  - Updated README.md with AI features section and setup instructions
+  - Added Google Gemini API key to prerequisites
+  - Updated project structure diagram
+
 ## [1.2.1] - 2025-10-18
 
 ### Changed
